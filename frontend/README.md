@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+### Bill Splitter and Expense Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Description
 
-## Available Scripts
+A billsplitter and expense tracker app would allow users to input expenses, categorize them, and split bills among multiple users. The app would keep track of all expenses and allow users to see how much they owe or are owed by others. Users could also set up recurring expenses and receive notifications when bills are due. The app would also include features such as budget tracking, the ability to export expense reports, and the ability to add notes or receipts to each expense entry.
 
-In the project directory, you can run:
+# Frontend:
 
-### `npm start`
+1. React JS
+2. Tailwind CSS
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Backend:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. Python Flask
 
-### `npm test`
+# Database:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+MongoDB
 
-### `npm run build`
+# Features:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Record expenses: The app should allow users to input all of their expenses, including the amount, date, and description.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Categorize expenses: Users should be able to categorize expenses, such as by type (e.g. food, transportation) or by purpose (e.g. business, personal).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Set budgets: Users should be able to set budgets for different categories and receive notifications when they are close to exceeding them.
 
-### `npm run eject`
+4. View reports: The app should provide reports on spending patterns, such as monthly or yearly expenses broken down by category.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. Export data: Users should be able to export their data to a spreadsheet or other format for analysis or sharing.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+6. Add receipts: The app should allow users to add receipts to expense entries, either by taking a photo or uploading an image.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+7. Track reimbursements: If the user is expecting to be reimbursed for an expense, the app should allow them to track the status of the reimbursement.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+8. Sync across devices: The app should allow users to sync their data across multiple devices, so they can access their expense data from anywhere.
 
-## Learn More
+9. Backup data: The app should automatically back up the user's data to prevent loss of data.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+10. Set reminders: The app should allow users to set reminders for when bills are due or when they need to input expenses.

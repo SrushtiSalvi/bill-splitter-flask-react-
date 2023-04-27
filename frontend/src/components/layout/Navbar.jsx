@@ -3,8 +3,11 @@ import { useEffect } from "react";
 import { BsFillPersonFill } from "react-icons/bs";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { get_user_details } from "../../api";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [user, setUser] = useState({});
 
@@ -13,6 +16,11 @@ const Navbar = () => {
     if (res.data.success) {
       setUser(res.data.user);
     }
+  };
+  const handleLogout = async () => {
+    localStorage.removeItem("access_token");
+
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -39,13 +47,14 @@ const Navbar = () => {
             }
             id="example-navbar-danger"
           >
-            <span className="text-white">Bill Splitter</span>
-            <div>
+            <span className="text-white font-bold">Bill Splitter</span>
+            <div className="flex space-x-5 text-white">
               <button className=" flex">
                 <BsFillPersonFill className="text-2xl border rounded-full text-white" />
                 <span className="text-white px-2">{user.firstName}</span>
                 <RiArrowDropDownLine className="text-2xl text-white" />
               </button>
+              <button onClick={handleLogout}>Logout</button>
             </div>
           </div>
         </div>

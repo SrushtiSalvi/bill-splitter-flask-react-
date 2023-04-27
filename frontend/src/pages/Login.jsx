@@ -25,10 +25,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     const res = await login(email, password);
-    console.log(res);
     if (res.data.success) {
       toast("login successful");
-      localStorage.setItem("access_token", res["data"]["access_token"]);
+      await localStorage.setItem("access_token", res["data"]["access_token"]);
       //   localStorage.setItem("user", JSON.stringify(res.user));
       dispatch(
         userlogin({
@@ -36,14 +35,13 @@ const Login = () => {
           lastName: res.data.user.lastName,
           email: res.data.user.email,
           number: res.data.user.number,
+          access_token: res.data.access_token,
         })
       );
       navigate("/home");
     } else {
       toast(res.data.message);
     }
-
-    // console.log(res);
   };
   return (
     <div className="relative flex flex-col justify-center min-h-screen overflow-hidden bg-gray-100">

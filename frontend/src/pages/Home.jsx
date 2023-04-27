@@ -9,7 +9,7 @@ const Home = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
-    if (accessToken) {
+    if (!accessToken) {
       setIsLoggedIn(true);
       toast("You are already logged in");
       return navigate("/home");

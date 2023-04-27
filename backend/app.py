@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, Response, jsonify
 from flask_pymongo import PyMongo
 from datetime import datetime
 from datetime import timedelta
@@ -58,7 +58,7 @@ def login():
             access_token = create_access_token(
                 identity=found_user["email"], additional_claims=payload
             )
-            return {
+            response = jsonify({
                 "success": True,
                 "message": "User logged In successfully",
                 "access_token": access_token,
@@ -69,7 +69,9 @@ def login():
                     "number": found_user["number"],
 
                 }
-            }
+            })
+            # set_access_cookies(response, access_token)
+            return response
         else:
             return {"success": False, "message": "Incorrect password"}
     else:
@@ -126,6 +128,71 @@ def get_user_details():
         "user": user
     }
 
+@app.post('/user/set_monthly_budget')
+@jwt_required()
+def set_monthly_budget():
+    email = get_jwt_identity()
+    monthly_budget = request.json.get('monthly_budget', None)
+    if monthly_budget:
+        mongo.db.users.update_one({"email": email}, {"$set": {"monthlyBudget": monthly_budget}})
+        return {
+            "success": True,
+            "message": "Monthly budget set successfully",
+            "monthlyBudget": monthly_budget
+            
+        }
+    
+    else :
+        return {
+            "success": False,
+            "message": "Please add budget details",
+        }
+    
+@app.get('/user/get_monthly_budget')
+@jwt_required()
+def get_monthly_budget():
+    email = get_jwt_identity()
+    user = mongo.db.users.find_one({"email": email})
+    return {
+        "success": True,
+        "data": {
+            "monthlyBudget": user["monthlyBudget"]
+        }
+    }
+
+@app.get('/user/get_yearly_budget')
+@jwt_required()
+def get_yearly_budget():
+    email = get_jwt_identity()
+    user = mongo.db.users.find_one({"email": email})
+    return {
+        "success": True,
+        "data": {
+            "yearlyBudget": user["yearlyBudget"]
+        }
+    }
+    
+@app.post('/user/set_yearly_budget')
+@jwt_required()
+def set_yearly_budget():
+    email = get_jwt_identity()
+    yearly_budget = request.json.get('yearly_budget', None)
+    if yearly_budget:
+        mongo.db.users.update_one({"email": email}, {"$set": {"yearlyBudget": yearly_budget}})
+        return {
+            "success": True,
+            "message": "Yearly budget set successfully",
+            "data": {
+                "yearlyBudget": yearly_budget
+            }
+        }
+    
+    else :
+        return {
+            "success": False,
+            "message": "Please add budget details",
+        }
+
 @app.post('/expense/add')
 @jwt_required()
 def add_expense():
@@ -136,10 +203,11 @@ def add_expense():
     if title and amount :
         expense = {
             "_id": str(uuid.uuid4()),
-            "email": email,
+            "createdBy": email,
             "title": title,
             "amount": float(amount),
-            "category": category
+            "category": category,
+            "createdAt": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         }
         mongo.db.expenses.insert_one(expense)
         return {
@@ -156,9 +224,44 @@ def add_expense():
 
 @app.get('/expense/get_all')
 @jwt_required()
-def get_total_expenses():
+def get_all_expenses():
     email = get_jwt_identity()
-    expenses = list(mongo.db.expenses.find({"email": email}))
+    expenses = list(mongo.db.expenses.find({"createdBy": email}))
+    # print(expenses)
+    total_amount  = 0
+    for expense in expenses:
+        total_amount = total_amount + expense["amount"]
+    return {
+        "success": True,
+        "expenses": expenses,
+        "total_amount": total_amount,
+        "message": "Total expenses fetched successfully"
+    }
+
+@app.post('/expense/get_all_by_category')
+@jwt_required()
+def get_all_expenses_by_category():
+    email = get_jwt_identity()
+    categories = request.json.get('categories', None)
+    expenses = list(mongo.db.expenses.find({"category": {"$in": categories},"createdBy": email }))
+    # print(expenses)
+    total_amount  = 0
+    for expense in expenses:
+        total_amount = total_amount + expense["amount"]
+    return {
+        "success": True,
+        "expenses": expenses,
+        "total_amount": total_amount,
+        "message": "Total expenses fetched successfully"
+    }
+
+@app.post('/expense/get_all_by_price')
+@jwt_required()
+def get_all_expenses_by_price():
+    email = get_jwt_identity()
+    min = request.json.get('min', None)
+    max = request.json.get('max', None)
+    expenses = list(mongo.db.expenses.find({"amount": {"$gte": float(min), "$lte": float(max)},"createdBy": email }))
     # print(expenses)
     total_amount  = 0
     for expense in expenses:
@@ -192,12 +295,14 @@ def update_expense(_id):
     email = get_jwt_identity()
     title = request.json.get('title', None)
     amount = request.json.get('amount', None)
+    updatedAt = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     if title and amount :
         expense = {
             "title": title,
-            "amount": float(amount)
+            "amount": float(amount),
+            "updatedAt": updatedAt
         }
-        done = mongo.db.expenses.update_one({"_id": _id, "email": email}, {"$set": expense})
+        done = mongo.db.expenses.update_one({"_id": _id, "createdBy": email}, {"$set": expense})
         expense["_id"] = _id
         if done.modified_count:
             return {
@@ -235,6 +340,9 @@ def delete_expense(_id):
             "success": False,
             "message": "Expense not found"
         }
+
+
+
     
 
 if __name__ == "__main__":

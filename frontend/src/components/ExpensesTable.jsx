@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { toast } from "react-toastify";
-import { delete_expense } from "../api";
+import { delete_expense, get_all_expenses } from "../api";
 import EditExpense from "./EditExpense";
+import { useDispatch, useSelector } from "react-redux";
+import exp, { setExpenseData } from "../features/expensesSlice";
+import { selectExpenseData } from "../features/expensesSlice";
 
 const style = {
   position: "absolute",
@@ -17,23 +20,33 @@ const style = {
   p: 4,
 };
 
-const ExpensesTable = ({ expenses, setExpenses }) => {
+const ExpensesTable = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalopen, setEditModalOpen] = useState(false);
   const [modalData, setModalData] = useState({});
 
-  console.log(expenses);
+  const expenseData = useSelector(selectExpenseData);
+  const expenses = expenseData.expenses;
+  const dispatch = useDispatch();
 
   const handleDelete = async (id) => {
-    // console.log(id);
     const res = await delete_expense(id);
-
-    console.log(res.data);
     if (res.data.success) {
-      const newExpenses = expenses.filter((expense) => expense._id !== id);
-      setExpenses(newExpenses);
-      setDeleteModalOpen(false);
-      toast(res.data.message);
+      const res = await get_all_expenses();
+      if (res.data.success) {
+        // const newExpenses = expenses.filter((expense) => expense._id !== id);
+        dispatch(
+          setExpenseData({
+            expenses: res.data.expenses,
+            totalAmount: res.data.total_amount,
+          })
+        );
+        // dispatch(setTotalAmount(res.data.total_amount));
+        setDeleteModalOpen(false);
+        toast(res.data.message);
+      } else {
+        toast(res.data.message);
+      }
     } else {
       toast(res.data.message);
     }
@@ -86,85 +99,86 @@ const ExpensesTable = ({ expenses, setExpenses }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {expenses.map((expense, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                      {expense.title}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                      {expense.amount}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-                      {expense.category}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                      <button
-                        className="text-green-500 hover:text-green-700"
-                        onClick={() => {
-                          setModalData(expense);
-                          setEditModalOpen(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <Modal
-                        open={editModalopen}
-                        onClose={() => setEditModalOpen(false)}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                      >
-                        <Box sx={style}>
-                          <EditExpense
-                            data={modalData}
-                            setEditModalOpen={setEditModalOpen}
-                          />
-                        </Box>
-                      </Modal>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                      <button
-                        // onClick={handleOpen}
-                        onClick={() => {
-                          setModalData(expense);
-                          setDeleteModalOpen(true);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Delete
-                      </button>
-                      <Modal
-                        open={deleteModalOpen}
-                        onClose={() => setDeleteModalOpen(false)}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                      >
-                        <Box sx={style}>
-                          <div className="space-y-4">
-                            <h1 className="font-bold">
-                              Are you sure you want to delete this expense?
-                            </h1>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(modalData._id)}
-                              className="px-2 py-1 text-green-600 border rounded-xl mr-2 border-green-600"
-                            >
-                              Yes
-                            </button>
-                            <button
-                              onClick={() => setDeleteModalOpen(false)}
-                              className="px-2 py-1 text-red-600 border rounded-xl mr-2 border-red-600"
-                            >
-                              No
-                            </button>
-                          </div>
-                        </Box>
-                      </Modal>
-                    </td>
-                  </tr>
-                ))}
+                {expenses &&
+                  expenses.map((expense, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {expense.title}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {expense.amount}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+                        {expense.category}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                        <button
+                          className="text-green-500 hover:text-green-700"
+                          onClick={() => {
+                            setModalData(expense);
+                            setEditModalOpen(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <Modal
+                          open={editModalopen}
+                          onClose={() => setEditModalOpen(false)}
+                          aria-labelledby="modal-modal-title"
+                          aria-describedby="modal-modal-description"
+                        >
+                          <Box sx={style}>
+                            <EditExpense
+                              data={modalData}
+                              setEditModalOpen={setEditModalOpen}
+                            />
+                          </Box>
+                        </Modal>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                        <button
+                          // onClick={handleOpen}
+                          onClick={() => {
+                            setModalData(expense);
+                            setDeleteModalOpen(true);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          Delete
+                        </button>
+                        <Modal
+                          open={deleteModalOpen}
+                          onClose={() => setDeleteModalOpen(false)}
+                          aria-labelledby="modal-modal-title"
+                          aria-describedby="modal-modal-description"
+                        >
+                          <Box sx={style}>
+                            <div className="space-y-4">
+                              <h1 className="font-bold">
+                                Are you sure you want to delete this expense?
+                              </h1>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(modalData._id)}
+                                className="px-2 py-1 text-green-600 border rounded-xl mr-2 border-green-600"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                onClick={() => setDeleteModalOpen(false)}
+                                className="px-2 py-1 text-red-600 border rounded-xl mr-2 border-red-600"
+                              >
+                                No
+                              </button>
+                            </div>
+                          </Box>
+                        </Modal>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

@@ -1,15 +1,32 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { update_expense } from "../api";
+import { update_expense, get_all_expenses } from "../api";
+import { useDispatch } from "react-redux";
+import exp, { setExpenseData } from "../features/expensesSlice";
 
 const EditExpense = ({ setEditModalOpen, data }) => {
   const [title, setTitle] = useState(data.title);
   const [amount, setAmount] = useState(data.amount);
+  const dispatch = useDispatch();
+
   const handleEditExpense = async () => {
     const res = await update_expense(data._id, title, amount);
     if (res.data.success) {
-      setEditModalOpen(false);
-      toast(res.data.message);
+      get_all_expenses()
+        .then((res) => {
+          if (res.data.success) {
+            dispatch(
+              setExpenseData({
+                expenses: res.data.expenses,
+                totalAmount: res.data.total_amount,
+              })
+            );
+            setEditModalOpen(false);
+          }
+        })
+        .catch((err) => {
+          toast(err.message);
+        });
     } else {
       toast(res.data.message);
     }

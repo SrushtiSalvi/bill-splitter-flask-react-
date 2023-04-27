@@ -30,7 +30,6 @@ const Signup = () => {
       return;
     } else {
       const res = await register(firstName, lastName, number, email, password);
-      console.log(res);
       if (res.data.success) {
         navigate("/login");
       } else {

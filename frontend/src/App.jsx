@@ -14,8 +14,10 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
 const App = () => {
-  const expenses = useSelector(selectExpenses);
-  console.log(expenses);
+  // const expenses = useSelector(selectExpenses);
+  // console.log(expenses);
+  // const user = useSelector(selectUser);
+  // console.log(user);
 
   return (
     <div>

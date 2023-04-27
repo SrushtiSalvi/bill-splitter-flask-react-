@@ -1,37 +1,38 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { add_expense } from "../api";
+import { add_expense, get_all_expenses } from "../api";
 import { IoAddOutline } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import exp, { setExpenseData } from "../features/expensesSlice";
+import { selectExpenseData } from "../features/expensesSlice";
+import { selectExpenseCategoriesData } from "../features/expensesCategoriesSlice";
 
-const AddExpense = ({
-  setOpen,
-  expenses,
-  setExpenses,
-  totalAmount,
-  setTotalAmount,
-}) => {
-  const categories = [
-    "food",
-    "clothing",
-    "healthcare",
-    "transport",
-    "beauty",
-    "essentials",
-    "others",
-  ];
-
+const AddExpense = ({ setOpen }) => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("other");
+  const dispatch = useDispatch();
+  const expenseData = useSelector(selectExpenseData);
+  const expenseCategoriesData = useSelector(selectExpenseCategoriesData);
+  const categories = expenseCategoriesData.expenseCategories;
 
   const handleAddExpense = async () => {
     const res = await add_expense(title, amount, category);
-    console.log(res);
     if (res.data.success) {
-      setExpenses([...expenses, res.data.expense]);
-      setTotalAmount(totalAmount + res.data.expense.amount);
-      setOpen(false);
-      toast(res.data.message);
+      get_all_expenses()
+        .then((res) => {
+          dispatch(
+            setExpenseData({
+              expenses: res.data.expenses,
+              totalAmount: res.data.total_amount,
+            })
+          );
+          setOpen(false);
+          toast(res.data.message);
+        })
+        .catch((err) => {
+          toast(err.message);
+        });
     } else {
       toast(res.data.message);
     }
@@ -65,8 +66,8 @@ const AddExpense = ({
           >
             <option value="">--Please choose an option--</option>
             {categories.map((category, index) => (
-              <option value={category} key={index}>
-                {category}
+              <option value={category.name} key={index}>
+                {category.name}
               </option>
             ))}
           </select>
